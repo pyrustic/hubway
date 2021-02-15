@@ -1,4 +1,2 @@
-recursive-include hubway *.json
-recursive-include hubway *.txt
-recursive-include hubway *.png
-recursive-include hubway LICENSE
+recursive-include hubway *
+global-exclude *.py[cod]

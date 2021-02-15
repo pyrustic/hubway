@@ -2,17 +2,17 @@ from pyrustic.manager.misc import funcs
 from pyrustic.manager import constant
 from pyrustic.jasonix import Jasonix
 from hubway.host.publishing_host import PublishingHost
-from distutils.version import StrictVersion
 import os
 import os.path
+import pkgutil
 
 
 class MainHost:
     def __init__(self):
         self._login = None
-        self._jasonix = Jasonix(constant.HUB_SHARED_DATA_FILE,
-                                default=constant.DEFAULT_HUB_SHARED_DATA_FILE)
+        self._jasonix = None
         self._gurl = funcs.create_gurl()
+        self._setup()
 
     @property
     def login(self):
@@ -119,22 +119,21 @@ class MainHost:
 
     def get_assets_from_dist_folder(self):
         dist_folder = os.path.join(self.target_project(),
-                                   "pyrustic_data", "dist")
+                                   "dist")
         if not os.path.exists(dist_folder):
             return []
-        versions = []
+        assets = []
         for item in os.listdir(dist_folder):
+            _, ext = os.path.splitext(item)
+            if ext != ".whl":
+                continue
             path = os.path.join(dist_folder, item)
             if not os.path.isfile(path):
                 continue
-            cache = os.path.splitext(item)
-            if len(cache) != 2:
-                continue
-            version, ext = cache
-            versions.append(version)
-        versions.sort(key=StrictVersion)
-        versions.reverse()
-        return versions
+            assets.append(item)
+        assets.sort()
+        assets.reverse()
+        return assets
 
     def publishing(self, owner, repo, name,
                    tag_name, target_commitish,
@@ -222,6 +221,22 @@ class MainHost:
             return splitted
         else:
             return None
+
+    def get_asset_version(self, name):
+        pkg_name, version, *_ = name.split("-")
+        return version
+
+    def _setup(self):
+        shared_folder = os.path.join(constant.PYRUSTIC_DATA_FOLDER, "hubway")
+        shared_json_path = os.path.join(shared_folder, "hubway_shared_data.json")
+        if not os.path.exists(shared_folder):
+            os.makedirs(shared_folder)
+        if not os.path.exists(shared_json_path):
+            default_json = pkgutil.get_data("hubway",
+                                            "misc/default_shared_data.json")
+            with open(shared_json_path, "wb") as file:
+                file.write(default_json)
+        self._jasonix = Jasonix(shared_json_path)
 
     def _downloads_counter(self, json):
         count = 0

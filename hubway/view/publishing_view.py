@@ -8,11 +8,11 @@ from hubway.view.failure_view import FailureView
 
 
 class PublishingView(Viewable):
-    def __init__(self, master, main_view, main_host, asset_version):
+    def __init__(self, master, main_view, main_host, asset_name):
         self._master = master
         self._main_view = main_view
         self._main_host = main_host
-        self._asset_version = asset_version
+        self._asset_name = asset_name
         # stringvars and intvars
         self._strvar_target = tk.StringVar()
         self._strvar_owner = tk.StringVar()
@@ -175,10 +175,10 @@ class PublishingView(Viewable):
         frame = tk.Frame(parent)
         frame.grid(row=2, column=1, sticky="w")
         # label
-        label_archive_format = tk.Label(frame, text="Archive format")
+        label_archive_format = tk.Label(frame, text="Package format")
         label_archive_format.pack(anchor="w")
         # entry
-        strvar = tk.StringVar(value="zip")
+        strvar = tk.StringVar(value="Wheel")
         entry_archive_format = tk.Entry(frame, width=20,
                                         textvariable=strvar,
                                         state="readonly")
@@ -250,14 +250,13 @@ class PublishingView(Viewable):
         name = self._strvar_release_name.get()
         tag_name = self._strvar_tag_name.get()
         target_commitish = self._strvar_target_commitish.get()
-        description = self._text_description.get("1.0","end-1c")
+        description = self._text_description.get("1.0", "end-1c")
         prerelease = True if self._intvar_prerelease.get() == 1 else False
         draft = True if self._intvar_draft.get() == 1 else False
         asset_name = self._strvar_asset_name.get()
         asset_label = self._strvar_asset_label.get()
-        self._asset_path = os.path.join(self._target_project,
-                                        "pyrustic_data", "dist",
-                                        "{}.zip".format(self._asset_version))
+        self._asset_path = os.path.join(self._target_project, "dist",
+                                        self._asset_name)
         # threadom stuff
         threadom = self._main_view.threadom
         host = self._main_host.publishing
@@ -286,7 +285,7 @@ class PublishingView(Viewable):
         data = self._main_host.about_target_project()
         target = data["target"]
         project_name = data["project_name"]
-        version = self._asset_version
+        version = self._main_host.get_asset_version(self._asset_name)
         owner = self._main_host.login
         default_target_commitish = "master"
         # target
@@ -300,9 +299,10 @@ class PublishingView(Viewable):
         # tag name
         self._strvar_tag_name.set("v{}".format(version))
         # release name
-        self._strvar_release_name.set("v{}".format(version))
+        self._strvar_release_name.set("{}/{} - v{}".format(owner,
+                                                         project_name, version))
         # asset name
-        cache = "{}-v{}-released-by-{}.zip".format(project_name, version, owner)
+        cache = self._asset_name
         self._strvar_asset_name.set(cache)
         # asset label
         self._strvar_asset_label.set("Download the release")
@@ -311,17 +311,17 @@ class PublishingView(Viewable):
         repo = self._strvar_repo.get()
         pyrustic_link = "https://github.com/pyrustic/pyrustic#readme"
         hubstore_link = "https://github.com/pyrustic/hubstore#readme"
-        cache = "Install [Hubstore]({}):\n\n".format(hubstore_link)
+        cache = "Install [Hubstore]({}):\n  \n".format(hubstore_link)
         cache += "```bash\n"
         cache += "$ pip install hubstore\n"
-        cache += "```\n\n"
-        cache += "Run Hubstore:\n\n"
+        cache += "```\n  \n"
+        cache += "Run Hubstore:\n  \n"
         cache += "```bash\n"
         cache += "$ hubstore\n"
-        cache += "```\n\n"
-        cache += "Then paste/type this in Hubstore:\n`{}/{}`\n\n".format(owner, repo)
-        cache += "Enjoy !\n\n\n"
-        cache += "Packaged and released with [Pyrustic]({}).".format(pyrustic_link)
+        cache += "```\n  \n"
+        cache += "Then paste/type this in Hubstore:\n`{}/{}`\n  \n  \n".format(owner, repo)
+        cache += "Enjoy !\n  \n  \n"
+        cache += "Published with [Pyrustic]({}).".format(pyrustic_link)
         self._text_description.insert("1.0", cache)
 
     def _notify_publishing_response(self, data):
@@ -333,13 +333,8 @@ class PublishingView(Viewable):
         status_text = data["status_text"]
         message = "Successfully published"
         messages = {0: "Successfully published !",
-                    1: "Failed to cache the target project\n{}".format(data["data"]),
-                    2: "Tests failed\n{}".format(data["data"]),
-                    3: "Failed to execute prolog\n{}".format(data["data"]),
-                    4: "Failed to zip\n{}".format(data["data"]),
-                    5: "Failed to create release\n{}".format(status_text),
-                    6: "Failed to upload zip\n{}".format(status_text),
-                    7: "Failed to execute epilog\n{}".format(data["data"])}
+                    1: "Failed to create release\n{}".format(status_text),
+                    2: "Failed to upload asset\n{}".format(status_text)}
         message = messages[meta_code]
         if meta_code == 0:
             toast = Toast(self._body, message=message)

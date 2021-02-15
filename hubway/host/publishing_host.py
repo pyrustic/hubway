@@ -18,7 +18,7 @@ class PublishingHost:
         meta code:
             0- success
             1- failed to create release (check 'status_code', 'status_text')
-            2- failed to upload zip (check 'status_code', 'status_text')
+            2- failed to upload asset (check 'status_code', 'status_text')
         """
         publishing_result = {"meta_code": None, "status_code": None,
                             "status_text": None, "data": None}

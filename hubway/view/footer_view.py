@@ -30,7 +30,7 @@ class FooterView(Viewable):
             welcome_text = "Welcome Friend"
             if code == 304:
                 welcome_text = "Welcome back Friend !"
-            Toast(message=welcome_text).build()
+            Toast(message=welcome_text, duration=600).build()
         else:
             Toast(message=info).build()
             self.cancel_authenticating()
@@ -93,13 +93,13 @@ class FooterView(Viewable):
             return
         items = self._main_host.get_assets_from_dist_folder()
         if not items:
-            message = "Please create an asset first !\nType 'pkg' in the Manager."
+            message = "Please create an asset first !\nType 'build' in the Manager."
             toast = Toast(self._body, message=message,
                           duration=5000)
             toast.build_wait()
             return
         message = "This is the list of available assets in\n"
-        message += "the folder $TARGET/pyrustic_data/dist"
+        message += "the folder $TARGET/dist"
         choice = Choice(self._body,
                         items=items,
                         title="Asset selection",

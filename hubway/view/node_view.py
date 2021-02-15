@@ -20,11 +20,12 @@ class NodeView(Viewable):
             return
         status_code, status_text, data = data
         if status_code in (200, 304):
-            success_layouts = {"description": self._set_description_layout,
-                       "latest_release": self._set_latest_release_layout,
-                       "total_downloads": self._set_total_downloads_layout}
-            if datatype in success_layouts:
-                success_layouts[datatype](data)
+            if datatype == "description":
+                self._set_description_layout(data)
+            elif datatype == "latest_release":
+                self._set_latest_release_layout(data)
+            elif datatype == "total_downloads":
+                self._set_total_downloads_layout(data)
         else:
             self._set_failure_layout(datatype, status_code, status_text)
 
@@ -40,16 +41,19 @@ class NodeView(Viewable):
                                       name="button_expander",
                                       textvariable=self._strvar_expand,
                                       command=command)
-            button_expand.pack(side=tk.LEFT, padx=2)
+            #button_expand.pack(side=tk.LEFT, padx=2)
+            button_expand.grid(column=0, row=0, sticky="w", padx=2)
             instance_name = "label_owner" if node_type == "owner" else "label_repo"
             label = tk.Label(self._body, name=instance_name, text=data["name"])
-            label.pack(side=tk.LEFT)
+            #label.pack(side=tk.LEFT)
+            label.grid(column=1, row=0, sticky="w")
             command = self._on_click_button_close
             button_delete = tk.Button(self._body,
                                       name="button_close",
                                       text="x",
                                       command=command)
-            button_delete.pack(side=tk.LEFT, padx=(10, 0))
+            #button_delete.pack(side=tk.LEFT, padx=(10, 0))
+            button_delete.grid(column=2, row=0, sticky="w", padx=(10, 0))
 
     def _on_display(self):
         node = self._tree_view.node(self._node_id)
@@ -95,10 +99,12 @@ class NodeView(Viewable):
         # label title
         label_title = tk.Label(self._body, name="label_info_title",
                                text="{}: ".format(data["name"]))
-        label_title.pack(side=tk.LEFT, padx=0)
+        #label_title.pack(side=tk.LEFT, padx=0)
+        label_title.grid(column=0, row=0, sticky="w", padx=0)
         # label info
         label_info = tk.Label(self._body, text="Loading...")
-        label_info.pack(side=tk.LEFT, padx=0)
+        #label_info.pack(side=tk.LEFT, padx=0)
+        label_info.grid(column=1, row=0, sticky="w", padx=0)
 
     def _clear_node(self):
         for child in self._body.winfo_children():
