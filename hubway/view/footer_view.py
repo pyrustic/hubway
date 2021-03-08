@@ -1,13 +1,14 @@
 import tkinter as tk
-from pyrustic.viewable import Viewable
+from pyrustic.view import View
 from pyrustic.widget.toast import Toast
 from pyrustic.widget.choice import Choice
 from hubway.view.auth_view import AuthView
 from hubway.view.publishing_view import PublishingView
 
 
-class FooterView(Viewable):
+class FooterView(View):
     def __init__(self, master, main_view, main_host):
+        super().__init__()
         self._master = master
         self._main_view = main_view
         self._main_host = main_host
@@ -30,9 +31,9 @@ class FooterView(Viewable):
             welcome_text = "Welcome Friend"
             if code == 304:
                 welcome_text = "Welcome back Friend !"
-            Toast(message=welcome_text, duration=600).build()
+            Toast(message=welcome_text, duration=600)
         else:
-            Toast(message=info).build()
+            Toast(message=info)
             self.cancel_authenticating()
         if self._toast_auth:
             self._toast_auth.destroy()
@@ -41,7 +42,6 @@ class FooterView(Viewable):
     def notify_authenticating(self):
         message = "Authenticating..."
         self._toast_auth = Toast(self._body, message=message, duration=None)
-        self._toast_auth.build()
 
     def cancel_authenticating(self):
         self._auth_intvar.set(0)
@@ -88,15 +88,14 @@ class FooterView(Viewable):
 
     def _on_click_button_publishing(self):
         if self._main_host.login is None:
-            toast = Toast(self._body, message="Please authenticate yourself !")
-            toast.build()
+            Toast(self._body, message="Please authenticate yourself !")
             return
         items = self._main_host.get_assets_from_dist_folder()
         if not items:
             message = "Please create an asset first !\nType 'build' in the Manager."
             toast = Toast(self._body, message=message,
                           duration=5000)
-            toast.build_wait()
+            toast.wait_window()
             return
         message = "This is the list of available assets in\n"
         message += "the folder $TARGET/dist"
@@ -106,7 +105,7 @@ class FooterView(Viewable):
                         header="Select an asset",
                         message=message,
                         flavor="radio")
-        choice.build_wait()
+        choice.wait_window()
         asset_version = choice.selected
         if not asset_version:
             return

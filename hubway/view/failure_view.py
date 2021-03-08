@@ -1,10 +1,11 @@
 import tkinter as tk
-from pyrustic.viewable import Viewable
+from pyrustic.view import View
 from pyrustic import tkmisc
 
 
-class FailureView(Viewable):
+class FailureView(View):
     def __init__(self, master, main_view, main_host, data):
+        super().__init__()
         self._master = master
         self._main_view = main_view
         self._main_host = main_host

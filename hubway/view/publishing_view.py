@@ -1,4 +1,4 @@
-from pyrustic.viewable import Viewable
+from pyrustic.view import View
 from pyrustic.widget.confirm import Confirm
 from pyrustic.widget.toast import Toast
 from pyrustic import tkmisc
@@ -7,8 +7,42 @@ import os.path
 from hubway.view.failure_view import FailureView
 
 
-class PublishingView(Viewable):
+TEXT = """\
+Install [Hubstore]({hubstore_link}):
+
+```bash
+$ pip install hubstore
+```
+
+or upgrade Hubstore:
+
+```bash
+$ pip install hubstore --upgrade --upgrade-strategy eager
+```
+
+
+Run Hubstore:
+
+```bash
+$ hubstore
+```
+
+
+Then paste or type this in Hubstore:
+
+`{owner}/{repo}`
+
+
+Enjoy !
+
+
+
+Published with [Pyrustic]({pyrustic_link})
+"""
+
+class PublishingView(View):
     def __init__(self, master, main_view, main_host, asset_name):
+        super().__init__()
         self._master = master
         self._main_view = main_view
         self._main_host = main_host
@@ -242,7 +276,7 @@ class PublishingView(Viewable):
         confirm = Confirm(self._body, title="Confirmation",
                           header="Ready to publish your project",
                           message="Do you want to continue ?")
-        confirm.build_wait()
+        confirm.wait_window()
         if not confirm.ok:
             return
         owner = self._strvar_owner.get()
@@ -264,19 +298,16 @@ class PublishingView(Viewable):
                      description, prerelease, draft,
                      self._asset_path, asset_name, asset_label)
         consumer = self._notify_publishing_response
-        threadom.run(host, args=host_args, consumer=consumer)
+        threadom.run(host, target_args=host_args, consumer=consumer)
         self._cache_toast_processing = Toast(self._body, message="Processing...",
                                              duration=None)
-        self._cache_toast_processing.build()
 
     def _check_mandatory_field(self):
         if self._strvar_repo.get() == "":
             toast = Toast(self._body, message="Please set the repository name")
-            toast.build()
             return False
         if self._strvar_tag_name.get() == "":
-            toast = Toast(self._body, message="Please set the tag name")
-            toast.build()
+            Toast(self._body, message="Please set the tag name")
             return False
         return True
 
@@ -311,18 +342,10 @@ class PublishingView(Viewable):
         repo = self._strvar_repo.get()
         pyrustic_link = "https://github.com/pyrustic/pyrustic#readme"
         hubstore_link = "https://github.com/pyrustic/hubstore#readme"
-        cache = "Install [Hubstore]({}):\n  \n".format(hubstore_link)
-        cache += "```bash\n"
-        cache += "$ pip install hubstore\n"
-        cache += "```\n  \n"
-        cache += "Run Hubstore:\n  \n"
-        cache += "```bash\n"
-        cache += "$ hubstore\n"
-        cache += "```\n  \n"
-        cache += "Then paste/type this in Hubstore:\n`{}/{}`\n  \n  \n".format(owner, repo)
-        cache += "Enjoy !\n  \n  \n"
-        cache += "Published with [Pyrustic]({}).".format(pyrustic_link)
-        self._text_description.insert("1.0", cache)
+        text = TEXT.format(hubstore_link=hubstore_link,
+                           owner=owner, repo=repo,
+                           pyrustic_link=pyrustic_link)
+        self._text_description.insert("1.0", text)
 
     def _notify_publishing_response(self, data):
         if self._cache_toast_processing:
@@ -338,7 +361,7 @@ class PublishingView(Viewable):
         message = messages[meta_code]
         if meta_code == 0:
             toast = Toast(self._body, message=message)
-            toast.build_wait()
+            toast.wait_window()
             data = (self._strvar_owner.get(), self._strvar_repo.get())
             self._main_view.central_view.add_node(*data)
             self.destroy()

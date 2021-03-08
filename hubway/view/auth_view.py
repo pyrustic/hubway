@@ -1,10 +1,11 @@
-from pyrustic.viewable import Viewable
+from pyrustic.view import View
 from pyrustic import tkmisc
 import tkinter as tk
 
 
-class AuthView(Viewable):
+class AuthView(View):
     def __init__(self, master, main_view, main_host):
+        super().__init__()
         self._master = master
         self._main_view = main_view
         self._main_host = main_host
@@ -49,7 +50,7 @@ class AuthView(Viewable):
         if token:
             consumer = (lambda code, info, data:
                         self._main_view.footer_view.set_auth(code, info, data))
-            self._main_view.threadom.run(self._main_host.auth, args=[token],
+            self._main_view.threadom.run(self._main_host.auth, target_args=[token],
                                            consumer=consumer, unpack_result=True)
             self._data_submitted = True
             self._main_view.footer_view.notify_authenticating()

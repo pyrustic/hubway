@@ -1,11 +1,12 @@
-from pyrustic.viewable import Viewable
+from pyrustic.view import View
 import tkinter as tk
 
 
-class NodeView(Viewable):
-    def __init__(self, master, tree_view, main_view, main_host, node_id):
+class NodeView(View):
+    def __init__(self, master, tree, main_view, main_host, node_id):
+        super().__init__()
         self._master = master
-        self._tree_view = tree_view
+        self._tree = tree
         self._main_view = main_view
         self._main_host = main_host
         self._node_id = node_id
@@ -31,7 +32,7 @@ class NodeView(Viewable):
 
     def _on_build(self):
         self._body = tk.Frame(self._master)
-        node = self._tree_view.node(self._node_id)
+        node = self._tree.node(self._node_id)
         data = node["data"]
         node_type = data["type"]
         if node_type in ("owner", "repo"):
@@ -56,7 +57,7 @@ class NodeView(Viewable):
             button_delete.grid(column=2, row=0, sticky="w", padx=(10, 0))
 
     def _on_display(self):
-        node = self._tree_view.node(self._node_id)
+        node = self._tree.node(self._node_id)
         expanded = node["expanded"]
         cache = "+"
         if expanded:
@@ -71,7 +72,7 @@ class NodeView(Viewable):
 
     def _on_click_button_close(self):
         # get data from node
-        node = self._tree_view.node(self._node_id)
+        node = self._tree.node(self._node_id)
         owner = None
         repo = None
         node_type = node["data"]["type"]
@@ -80,20 +81,20 @@ class NodeView(Viewable):
             owner = node_name
         else:
             repo = node_name
-            parent_node = self._tree_view.node(node["parent"])
+            parent_node = self._tree.node(node["parent"])
             owner = parent_node["data"]["name"]
         self._main_host.update_activity("delete", owner, repo)
-        self._tree_view.delete(self._node_id)
+        self._tree.delete(self._node_id)
 
     def _collexp_node(self):
         cache = "+"
         if self._strvar_expand.get() == "+":
             cache = "-"
         self._strvar_expand.set(cache)
-        self._tree_view.collexp(self._node_id)
+        self._tree.collexp(self._node_id)
 
     def _set_loading_mode(self):
-        node = self._tree_view.node(self._node_id)
+        node = self._tree.node(self._node_id)
         data = node["data"]
         self._clear_node()
         # label title
@@ -113,7 +114,7 @@ class NodeView(Viewable):
     def _set_description_layout(self, data):
         self._clear_node()
         # title
-        text = self._tree_view.node(self._node_id)["data"]["name"]
+        text = self._tree.node(self._node_id)["data"]["name"]
         label_title = tk.Label(self._body, name="label_info_title", text=text)
         label_title.grid(column=0, row=0, sticky="w")
         # description
@@ -148,7 +149,7 @@ class NodeView(Viewable):
     def _set_latest_release_layout(self, data):
         self._clear_node()
         # title
-        text = self._tree_view.node(self._node_id)["data"]["name"]
+        text = self._tree.node(self._node_id)["data"]["name"]
         label_title = tk.Label(self._body, name="label_info_title", text=text)
         label_title.grid(column=0, row=0, sticky="w")
         # name
@@ -175,7 +176,7 @@ class NodeView(Viewable):
     def _set_total_downloads_layout(self, data):
         self._clear_node()
         # title
-        text = self._tree_view.node(self._node_id)["data"]["name"]
+        text = self._tree.node(self._node_id)["data"]["name"]
         label_title = tk.Label(self._body, name="label_info_title", text=text)
         label_title.grid(column=0, row=0, sticky="w")
         # name
@@ -191,7 +192,7 @@ class NodeView(Viewable):
 
     def _set_failure_layout(self, datatype, status_code, status_text):
         self._clear_node()
-        name = self._tree_view.node(self._node_id)["data"]["name"]
+        name = self._tree.node(self._node_id)["data"]["name"]
         # frame
         frame_title = tk.Frame(self._body)
         frame_title.grid(column=0, row=0, sticky="w")
@@ -210,10 +211,10 @@ class NodeView(Viewable):
 
     def populate(self):
         self._set_loading_mode()
-        node = self._tree_view.node(self._node_id)
+        node = self._tree.node(self._node_id)
         node_type = node["data"]["type"]
-        repo_node = self._tree_view.node(node["parent"])
-        owner_node = self._tree_view.node(repo_node["parent"])
+        repo_node = self._tree.node(node["parent"])
+        owner_node = self._tree.node(repo_node["parent"])
         repo = repo_node["data"]["name"]
         owner = owner_node["data"]["name"]
         threadom = self._main_view.threadom
@@ -225,9 +226,9 @@ class NodeView(Viewable):
         consumer = (lambda data, datatype=node_type,
                            self=self:
                     self.feed(datatype, data=data))
-        threadom.run(host, args=host_args, consumer=consumer)
+        threadom.run(host, target_args=host_args, consumer=consumer)
 
     def _node_still_exists(self):
-        if self._tree_view.node(self._node_id) is None:
+        if self._tree.node(self._node_id) is None:
             return False
         return True

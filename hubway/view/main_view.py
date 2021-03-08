@@ -1,14 +1,15 @@
 import tkinter as tk
 from pyrustic.threadom import Threadom
-from pyrustic.viewable import Viewable
+from pyrustic.view import View
 from hubway.host.main_host import MainHost
 from hubway.view.header_view import HeaderView
 from hubway.view.central_view import CentralView
 from hubway.view.footer_view import FooterView
 
 
-class MainView(Viewable):
+class MainView(View):
     def __init__(self, app):
+        super().__init__()
         self._app = app
         self._root = app.root
         self._main_host = MainHost()

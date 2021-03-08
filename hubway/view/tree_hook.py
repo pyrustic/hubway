@@ -1,11 +1,10 @@
 import tkinter as tk
-from pyrustic.widget.tree import Tree
+from pyrustic.widget.tree import Hook
 from hubway.view.node_view import NodeView
 
 
-class TreeView(Tree):
-    def __init__(self, master, main_view, main_host):
-        super().__init__(master, spacing=15)
+class TreeHook(Hook):
+    def __init__(self, main_view, main_host):
         self._main_view = main_view
         self._main_host = main_host
         self._cache = {}
@@ -16,47 +15,40 @@ class TreeView(Tree):
 
 
     # =============================
-    #      IMPLEMENTATION OF TREE
+    #      IMPLEMENTATION OF HOOK
     # =============================
-    def _on_display(self):
-        # insert first node
-        node_id = self.insert()
-        self.ghost(node_id)
-        # request last activity
-        host = self._main_host.last_activity
-        consumer = (lambda data, self=self:
-                    self.feed(datatype="last_activity", data=data))
-        self._main_view.threadom.run(host, consumer=consumer)
-
-    def _on_build_node(self, frame, node):
+    def on_build_node(self, tree, node, frame):
         node_id = node["node_id"]
         if node_id == 0:
             return
-        node_view = NodeView(frame, self, self._main_view, self._main_host, node_id)
+        node_view = NodeView(frame, tree, self._main_view, self._main_host, node_id)
         node_view.build_pack(expand=1, fill=tk.X, side=tk.LEFT)
-        self.tag(node_id, data={"node_view": node_view})
+        tree.tag(node_id, data={"node_view": node_view})
         node_type = node["data"]["type"]
         if node_type in ("description", "latest_release", "total_downloads"):
             node_view.populate()
 
-    def _on_feed(self, *args, **kwargs):
+    def on_display_node(self, tree, node):
+        pass
+
+    def on_feed_node(self, tree, node, *args, **kwargs):
         datatype = kwargs.get("datatype")
         data = kwargs.get("data")
         if datatype == "last_activity":
-            self._load_last_activity(data)
+            self._load_last_activity(node, data)
         elif datatype == "add_owner_repo":
-            self._add_owner_repo(*data)
+            self._add_owner_repo(tree, *data)
 
-    def _on_expand(self, node):
+    def on_expand_node(self, tree, node):
         node_id = node["node_id"]
         node_type = node["data"]["type"]
         node_view = node["data"].get("node_view", None)
         if node_view:
             node_view.edit_state(expanded=True)
-        if node_type == "repo" and not self.children(node_id):
-            self._insert_repo_sub_nodes(node_id)
+        if node_type == "repo" and not tree.descendants(node_id):
+            self._insert_repo_sub_nodes(tree, node_id)
 
-    def _on_collapse(self, node):
+    def on_collapse_node(self, tree, node):
         node_view = node["data"].get("node_view", None)
         if node_view:
             node_view.edit_state(expanded=False)
@@ -64,20 +56,20 @@ class TreeView(Tree):
     # =============================
     #           PRIVATE
     # =============================
-    def _load_last_activity(self, data):
+    def _load_last_activity(self, tree, data):
         for owner, repos in data.items():
             # add owner to tree
             data = {"type": "owner", "name": owner}
-            node_id = self.insert(parent=0, data=data, expand=True)
+            node_id = tree.insert(parent=0, data=data, expand=True)
             for repo in repos:
                 # add repo to owner
                 data = {"type": "repo", "name": repo}
-                self.insert(parent=node_id, data=data)
+                tree.insert(parent=node_id, data=data)
 
     # ===================
     def _request_data(self, node, node_type, node_view):
-        repo_node = self.node(node["parent"])
-        owner_node = self.node(repo_node["parent"])
+        repo_node = node(node["parent"])
+        owner_node = node(repo_node["parent"])
         repo = repo_node["data"]["name"]
         owner = owner_node["data"]["name"]
         threadom = self._main_view.threadom
@@ -89,50 +81,50 @@ class TreeView(Tree):
         consumer = (lambda data, datatype=node_type,
                            node_view=node_view:
                     node_view.feed(datatype, data=data))
-        threadom.run(host, args=host_args, consumer=consumer)
+        threadom.run(host, target_args=host_args, consumer=consumer)
 
-    def _add_owner_repo(self, owner, repo):
-        owner_node_id = self._add_owner(owner)
-        repo_node_id = self._add_repo(owner_node_id, repo)
+    def _add_owner_repo(self, tree, owner, repo):
+        owner_node_id = self._add_owner(tree, owner)
+        repo_node_id = self._add_repo(tree, owner_node_id, repo)
         # move owner node to top
-        self.move(owner_node_id)
+        tree.move(owner_node_id)
         # expand owner node
-        self.expand(owner_node_id)
+        tree.expand(owner_node_id)
         # pull scrollbar to top
         self._main_view.central_view.scrollbox.yview_moveto(0)
         # expand repo
-        self.expand(repo_node_id)
+        tree.expand(repo_node_id)
 
-    def _add_owner(self, owner):
+    def _add_owner(self, tree, owner):
         node_id = None
-        for node in self.children(0):
+        for node in tree.descendants(0):
             cache = node["data"]["name"]
             if cache.lower() == owner.lower():
                 node_id = node["node_id"]
                 return node_id
         # add owner to tree
         data = {"type": "owner", "name": owner}
-        node_id = self.insert(parent=0, data=data, expand=True, index=0)
+        node_id = tree.insert(parent=0, data=data, expand=True, index=0)
         return node_id
 
-    def _add_repo(self, parent_node_id, repo):
-        for node in self.children(parent_node_id):
+    def _add_repo(self, tree, parent_node_id, repo):
+        for node in tree.descendants(parent_node_id):
             cache = node["data"]["name"]
             if cache.lower() == repo.lower():
                 node_id = node["node_id"]
-                self.delete(node_id)
+                tree.delete(node_id)
         # add repo
         data = {"type": "repo", "name": repo}
-        node_id = self.insert(parent=parent_node_id, data=data, index=0)
+        node_id = tree.insert(parent=parent_node_id, data=data, index=0)
         return node_id
 
-    def _insert_repo_sub_nodes(self, node_id):
+    def _insert_repo_sub_nodes(self, tree, node_id):
         # insert Description Node
         data = {"type": "description", "name": "Repository description"}
-        self.insert(node_id, container=False, data=data)
+        tree.insert(node_id, container=False, data=data)
         # insert Latest Release Node
         data = {"type": "latest_release", "name": "Latest release"}
-        self.insert(node_id, container=False, data=data)
+        tree.insert(node_id, container=False, data=data)
         # insert Total Downloads Node
         data = {"type": "total_downloads", "name": "Latest ten (pre)releases"}
-        self.insert(node_id, container=False, data=data)
+        tree.insert(node_id, container=False, data=data)

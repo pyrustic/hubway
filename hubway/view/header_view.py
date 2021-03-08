@@ -1,11 +1,12 @@
 import tkinter as tk
-from pyrustic.viewable import Viewable
+from pyrustic.view import View
 from pyrustic import pymisc
 from pyrustic.widget.toast import Toast
 
 
-class HeaderView(Viewable):
+class HeaderView(View):
     def __init__(self, master, main_view, main_host):
+        super().__init__()
         self._master = master
         self._main_view = main_view
         self._main_host = main_host
@@ -28,8 +29,7 @@ class HeaderView(Viewable):
         else:
             duration = 1000
             message = "Failed to load data\n{}".format(status_text)
-        toast = Toast(self._body, message=message, duration=duration)
-        toast.build()
+        Toast(self._body, message=message, duration=duration)
 
     # =========================================
     #               LIFECYCLE
@@ -79,7 +79,6 @@ class HeaderView(Viewable):
         self._toast_loading = Toast(self._body,
                                     message="Rate Limit: Loading...",
                                     duration=None)
-        self._toast_loading.build()
         threadom = self._main_view.threadom
         host = self._main_host.rate
         consumer = self.show_rate
