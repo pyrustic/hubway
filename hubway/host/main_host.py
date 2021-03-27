@@ -117,7 +117,7 @@ class MainHost:
                 data += self._downloads_counter(release)
         return (*response.status, data)
 
-    def get_assets_from_dist_folder(self):
+    def get_assets_from_dist_folder(self):  # TODO: use manager.misc.funcs.wheels_assets ! best version sorter !!!
         dist_folder = os.path.join(self.target_project(),
                                    "dist")
         if not os.path.exists(dist_folder):

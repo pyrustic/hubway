@@ -1,13 +1,13 @@
 from pyrustic.theme import Theme
 from pyrustic import default_style
-from pyrustic.theme.cyberpunk import Cyberpunk
-from pyrustic.theme.cyberpunk import constant
-from pyrustic.theme.cyberpunk.native_widget import label
-from pyrustic.theme.cyberpunk.native_widget import entry
-from pyrustic.theme.cyberpunk.native_widget import button
-from pyrustic.theme.cyberpunk.native_widget import text
-from pyrustic.theme.cyberpunk.native_widget import checkbutton
-from pyrustic.theme.cyberpunk.native_widget import toplevel
+from tk_cyberpunk_theme import Cyberpunk
+from tk_cyberpunk_theme import constant
+from tk_cyberpunk_theme.native_widget import label
+from tk_cyberpunk_theme.native_widget import entry
+from tk_cyberpunk_theme.native_widget import button
+from tk_cyberpunk_theme.native_widget import text
+from tk_cyberpunk_theme.native_widget import checkbutton
+from tk_cyberpunk_theme.native_widget import toplevel
 
 
 # ========================================
@@ -73,6 +73,8 @@ def _get_button_go_style():
     style.highlightThickness = 0
     style.relief = "flat"
     style.padY = 0
+    style.borderWidth = 0
+    style.height = 0
     return style
 
 # button rate

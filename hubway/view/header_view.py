@@ -21,7 +21,7 @@ class HeaderView(View):
             self._toast_loading = None
         status_code, status_text, data = data
         message = None
-        duration = 5000
+        duration = 1600
         if status_code in (200, 304):
             message = "Rate Limit:\t{}\nRemaining :\t{}".format(data["limit"],
                                                              data["remaining"])
@@ -38,22 +38,22 @@ class HeaderView(View):
         self._body = tk.Frame(self._master)
         # label Query
         label_query = tk.Label(self._body, name="label_query", text="Query:")
-        label_query.pack(side=tk.LEFT, anchor="n")
+        label_query.pack(side=tk.LEFT, fill=tk.BOTH)
         # entry
         entry_search = tk.Entry(self._body, name="entry_search",
                                 width=40,
                                 textvariable=self._stringvar)
         entry_search.bind("<Return>", lambda e, self=self: self._on_click_search())
-        entry_search.pack(side=tk.LEFT, anchor="n")
+        entry_search.pack(side=tk.LEFT, fill=tk.BOTH)
         entry_search.focus()
         # button run
         button_run = tk.Button(self._body, name="button_go", text=">",
                                command=self._on_click_search)
-        button_run.pack(side=tk.LEFT, anchor="n")
+        button_run.pack(side=tk.LEFT, fill=tk.BOTH)
         # button rate
         button_rate = tk.Button(self._body, name="button_rate", text="Rate",
                                 command=self._on_click_rate)
-        button_rate.pack(side=tk.RIGHT, anchor="n", padx=2, pady=2)
+        button_rate.pack(side=tk.RIGHT, fill=tk.BOTH)
 
     def _on_display(self):
         pass

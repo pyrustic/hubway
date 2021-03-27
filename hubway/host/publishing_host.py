@@ -3,7 +3,7 @@ from pyrustic.manager.misc import funcs
 import urllib.parse
 
 
-class PublishingHost:
+class PublishingHost:  # TODO replace it with pyrustic.manager.catapult
     def __init__(self, gurl, owner, repo):
         self._gurl = gurl
         self._owner = owner
@@ -44,21 +44,6 @@ class PublishingHost:
             return publishing_result
         publishing_result["meta_code"] = 0
         return publishing_result
-
-    def _publishing(self, name, tag_name,
-                 target_commitish, description, prerelease,
-                 asset_path, asset_name, asset_label):
-        # create release
-        response = self._create_release(self._owner, self._repo, name, tag_name,
-                                        target_commitish, description,
-                                        prerelease)
-        code = response.code
-        if code == 201:
-            # upload asset
-            upload_url = response.json["upload_url"]
-            response = self._upload_asset(upload_url, asset_path,
-                                          asset_name, asset_label)
-        return response.status
 
     def _create_release(self, owner, repo, name, tag_name, target_commitish,
                         description, prerelease, draft):
