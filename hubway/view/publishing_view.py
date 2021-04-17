@@ -271,6 +271,12 @@ class PublishingView(View):
         self.destroy()
 
     def _on_click_publishing(self):
+        message = ("\n\nSorry but Hubway isn't anymore the",
+                   "recommended way to publish your app.",
+                   "Please use the command 'publish' in",
+                   "the Pyrustic command-line tool Manager !\n\n")
+        Toast(self._body, message="\n".join(message), duration=10000)
+        return
         if not self._check_mandatory_field():
             return
         confirm = Confirm(self._body, title="Confirmation",

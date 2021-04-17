@@ -222,6 +222,7 @@ def _get_entry_style():
 def _get_entry_search_style():
     style = entry.get_style()
     style.background = "white"
+    style.foreground = "black"
     style.insertBackground = constant.COLOR_BLACK
     return style
 
