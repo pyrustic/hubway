@@ -1,7 +1,6 @@
-from pyrustic.view import View
-from pyrustic.widget.confirm import Confirm
-from pyrustic.widget.toast import Toast
-from pyrustic import tkmisc
+from viewable import Viewable
+from megawidget.confirm import Confirm
+from megawidget.toast import Toast
 import tkinter as tk
 import os.path
 from hubway.view.failure_view import FailureView
@@ -40,7 +39,7 @@ Enjoy !
 Published with [Pyrustic]({pyrustic_link})
 """
 
-class PublishingView(View):
+class PublishingView(Viewable):
     def __init__(self, master, main_view, main_host, asset_name):
         super().__init__()
         self._master = master
@@ -66,7 +65,7 @@ class PublishingView(View):
         # target project
         self._target_project = None
 
-    def _on_build(self):
+    def _build(self):
         self._body = tk.Toplevel()
         self._body.title("Publishing")
         self._body.resizable(0, 0)
@@ -104,15 +103,10 @@ class PublishingView(View):
         # footer
         self._set_widgets_footer(self._body)
 
-    def _on_display(self):
+    def _on_map(self):
+        super()._on_map()
         self._populate()
 
-    def _on_destroy(self):
-        pass
-
-    def _toplevel_geometry(self):
-        tkmisc.center_window(self._body)
-        tkmisc.dialog_effect(self._body)
 
     # ====================================
     #               PRIVATE
@@ -275,7 +269,7 @@ class PublishingView(View):
                    "recommended way to publish your app.",
                    "Please use the command 'publish' in",
                    "the Pyrustic command-line tool Manager !\n\n")
-        Toast(self._body, message="\n".join(message), duration=10000)
+        Toast(self._body, message="\n".join(message), duration=20000)
         return
         if not self._check_mandatory_field():
             return

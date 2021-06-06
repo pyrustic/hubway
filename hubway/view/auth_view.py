@@ -1,9 +1,8 @@
-from pyrustic.view import View
-from pyrustic import tkmisc
+from viewable import Viewable
 import tkinter as tk
 
 
-class AuthView(View):
+class AuthView(Viewable):
     def __init__(self, master, main_view, main_host):
         super().__init__()
         self._master = master
@@ -13,7 +12,7 @@ class AuthView(View):
         self._strvar_token = tk.StringVar()
         self._data_submitted = False
 
-    def _on_build(self):
+    def _build(self):
         self._body = tk.Toplevel(self._master)
         self._body.title("Authentication")
         # token
@@ -37,9 +36,6 @@ class AuthView(View):
                                   text="Cancel",
                                   command=self._on_click_cancel)
         button_cancel.pack(side=tk.RIGHT, padx=(5, 2))
-
-    def _on_display(self):
-        tkmisc.dialog_effect(self._body)
 
     def _on_destroy(self):
         if not self._data_submitted:

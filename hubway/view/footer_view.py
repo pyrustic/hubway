@@ -1,12 +1,12 @@
 import tkinter as tk
-from pyrustic.view import View
-from pyrustic.widget.toast import Toast
-from pyrustic.widget.choice import Choice
+from viewable import Viewable
+from megawidget.toast import Toast
+from megawidget.choice import Choice
 from hubway.view.auth_view import AuthView
 from hubway.view.publishing_view import PublishingView
 
 
-class FooterView(View):
+class FooterView(Viewable):
     def __init__(self, master, main_view, main_host):
         super().__init__()
         self._master = master
@@ -50,7 +50,7 @@ class FooterView(View):
     # ===================================
     #              LIFECYCLE
     # ===================================
-    def _on_build(self):
+    def _build(self):
         self._body = tk.Frame(self._master)
         # checkbutton Auth
         checkbutton_auth = tk.Checkbutton(self._body,
@@ -64,12 +64,6 @@ class FooterView(View):
         button_publishing = tk.Button(self._body, name="button_publishing", text="Publish",
                                     command=self._on_click_button_publishing)
         button_publishing.pack(side=tk.RIGHT, padx=2, pady=2)
-
-    def _on_display(self):
-        pass
-
-    def _on_destroy(self):
-        pass
 
     # =============================
     #           PRIVATE

@@ -1,5 +1,5 @@
-from pyrustic.gurl import dict_to_json_body
-from pyrustic.manager.misc import funcs
+from kurl import dict_to_json_body
+from pyrustic.manager.core import funcs
 import urllib.parse
 
 

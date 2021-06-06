@@ -1,13 +1,13 @@
 import tkinter as tk
-from pyrustic.threadom import Threadom
-from pyrustic.view import View
+from threadom import Threadom
+from viewable import Viewable
 from hubway.host.main_host import MainHost
 from hubway.view.header_view import HeaderView
 from hubway.view.central_view import CentralView
 from hubway.view.footer_view import FooterView
 
 
-class MainView(View):
+class MainView(Viewable):
     def __init__(self, app):
         super().__init__()
         self._app = app
@@ -39,7 +39,7 @@ class MainView(View):
     def footer_view(self):
         return self._footer_view
 
-    def _on_build(self):
+    def _build(self):
         self._body = tk.Frame(self._root)
         # header
         self._header_view = HeaderView(self._body, self, self._main_host)
@@ -50,9 +50,3 @@ class MainView(View):
         # footer
         self._footer_view = FooterView(self._body, self, self._main_host)
         self._footer_view.build_pack(fill=tk.X, pady=(10, 0))
-
-    def _on_display(self):
-        pass
-
-    def _on_destroy(self):
-        pass

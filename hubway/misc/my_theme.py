@@ -1,13 +1,13 @@
-from pyrustic.theme import Theme
-from pyrustic import default_style
-from tk_cyberpunk_theme.main import Cyberpunk
-from tk_cyberpunk_theme import constant
-from tk_cyberpunk_theme.native_widget import label
-from tk_cyberpunk_theme.native_widget import entry
-from tk_cyberpunk_theme.native_widget import button
-from tk_cyberpunk_theme.native_widget import text
-from tk_cyberpunk_theme.native_widget import checkbutton
-from tk_cyberpunk_theme.native_widget import toplevel
+from themebase import Theme
+import stylebase
+from cyberpunk_theme import Cyberpunk
+from cyberpunk_theme import constant
+from cyberpunk_theme.widget import label
+from cyberpunk_theme.widget import entry
+from cyberpunk_theme.widget import button
+from cyberpunk_theme.widget import text
+from cyberpunk_theme.widget import checkbutton
+from cyberpunk_theme.widget import toplevel
 
 
 # ========================================
@@ -102,7 +102,7 @@ def _get_button_publishing_style():
 
 # expander button
 def _get_button_expander_style():
-    style = default_style.Button()
+    style = stylebase.Button()
     style.font = constant.FONT_FAV_BOLD
     style.background = constant.COLOR_BLACK
     style.foreground = "gray"
@@ -116,7 +116,7 @@ def _get_button_expander_style():
 
 # button close
 def _get_toolbar_button_close_style():
-    style = default_style.Button()
+    style = stylebase.Button()
     style.background = "#191919"
     style.activeBackground = "#670000"
     style.activeForeground = "#FF0023"
@@ -167,7 +167,7 @@ def _get_button_retry_style():
 
 # node info
 def _get_node_info_style():
-    style = default_style.Frame()
+    style = stylebase.Frame()
     style.background = "#002323"
     return style
 
@@ -191,7 +191,7 @@ def _get_label_counts_style():
 
 # entry repo description
 def _get_entry_repo_description_style():
-    style = default_style.Entry()
+    style = stylebase.Entry()
     style.readonlyBackground = constant.COLOR_BLACK
     style.background = constant.COLOR_BLACK
     style.font = constant.FONT_FAV_NORMAL

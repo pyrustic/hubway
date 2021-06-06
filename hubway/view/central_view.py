@@ -1,11 +1,11 @@
 import tkinter as tk
-from pyrustic.view import View
-from pyrustic.widget.scrollbox import Scrollbox
-from pyrustic.widget.tree import Tree
+from viewable import Viewable
+from megawidget.scrollbox import Scrollbox
+from megawidget.tree import Tree
 from hubway.view.tree_hook import TreeHook
 
 
-class CentralView(View):
+class CentralView(Viewable):
     def __init__(self, master, main_view, main_host):
         super().__init__()
         self._master = master
@@ -39,7 +39,7 @@ class CentralView(View):
     # ===============================
     #            LIFECYCLE
     # ===============================
-    def _on_build(self):
+    def _build(self):
         self._body = tk.Frame(self._master)
         # scrollbox
         self._scrollbox = Scrollbox(self._body, orient="v")
@@ -52,7 +52,8 @@ class CentralView(View):
         self._tree.hook = hook
 
 
-    def _on_display(self):
+    def _on_map(self):
+        super()._on_map()
         # insert first node
         # insert ghost root node
         self._insert_ghost_root()

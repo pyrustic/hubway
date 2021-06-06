@@ -1,10 +1,9 @@
 import tkinter as tk
-from pyrustic.view import View
-from pyrustic import pymisc
-from pyrustic.widget.toast import Toast
+from viewable import Viewable
+from megawidget.toast import Toast
 
 
-class HeaderView(View):
+class HeaderView(Viewable):
     def __init__(self, master, main_view, main_host):
         super().__init__()
         self._master = master
@@ -25,7 +24,7 @@ class HeaderView(View):
         if status_code in (200, 304):
             message = "Rate Limit:\t{}\nRemaining :\t{}".format(data["limit"],
                                                              data["remaining"])
-            message = pymisc.tab_to_space(message, tab_size=4)
+            message = tab_to_space(message, tab_size=4)
         else:
             duration = 1000
             message = "Failed to load data\n{}".format(status_text)
@@ -34,7 +33,7 @@ class HeaderView(View):
     # =========================================
     #               LIFECYCLE
     # =========================================
-    def _on_build(self):  # TODO, on windows, the ">" button isn't well aligned with widgets at Left
+    def _build(self):  # TODO, on windows, the ">" button isn't well aligned with widgets at Left
         self._body = tk.Frame(self._master)
         # label Query
         label_query = tk.Label(self._body, name="label_query", text="Query:")
@@ -54,12 +53,6 @@ class HeaderView(View):
         button_rate = tk.Button(self._body, name="button_rate", text="Rate",
                                 command=self._on_click_rate)
         button_rate.pack(side=tk.RIGHT, fill=tk.BOTH)
-
-    def _on_display(self):
-        pass
-
-    def _on_destroy(self):
-        pass
 
     # =========================================
     #               PRIVATE
@@ -83,3 +76,20 @@ class HeaderView(View):
         host = self._main_host.rate
         consumer = self.show_rate
         threadom.run(host, consumer=consumer)
+
+
+def tab_to_space(text, tab_size=4):
+    TAB = "\t"
+    SPACE = " "
+    lines = text.split("\n")
+    results = []
+    for line in lines:
+        cache = str()
+        for char in line:
+            if char == TAB:
+                while len(cache) % tab_size != 0:
+                    cache += SPACE
+            else:
+                cache += char
+        results.append(cache)
+    return "\n".join(results)

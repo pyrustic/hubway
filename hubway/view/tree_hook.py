@@ -1,5 +1,5 @@
 import tkinter as tk
-from pyrustic.widget.tree import Hook
+from megawidget.tree import Hook
 from hubway.view.node_view import NodeView
 
 
@@ -17,7 +17,7 @@ class TreeHook(Hook):
     # =============================
     #      IMPLEMENTATION OF HOOK
     # =============================
-    def on_build_node(self, tree, node, frame):
+    def build_node(self, tree, node, frame):
         node_id = node["node_id"]
         if node_id == 0:
             return
@@ -28,7 +28,7 @@ class TreeHook(Hook):
         if node_type in ("description", "latest_release", "total_downloads"):
             node_view.populate()
 
-    def on_display_node(self, tree, node):
+    def on_map_node(self, tree, node):
         pass
 
     def on_feed_node(self, tree, node, *args, **kwargs):

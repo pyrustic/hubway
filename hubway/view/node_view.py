@@ -1,8 +1,8 @@
-from pyrustic.view import View
+from viewable import Viewable
 import tkinter as tk
 
 
-class NodeView(View):
+class NodeView(Viewable):
     def __init__(self, master, tree, main_view, main_host, node_id):
         super().__init__()
         self._master = master
@@ -30,7 +30,7 @@ class NodeView(View):
         else:
             self._set_failure_layout(datatype, status_code, status_text)
 
-    def _on_build(self):
+    def _build(self):
         self._body = tk.Frame(self._master)
         node = self._tree.node(self._node_id)
         data = node["data"]
@@ -56,7 +56,7 @@ class NodeView(View):
             #button_delete.pack(side=tk.LEFT, padx=(10, 0))
             button_delete.grid(column=2, row=0, sticky="w", padx=(10, 0))
 
-    def _on_display(self):
+    def _on_map(self):
         node = self._tree.node(self._node_id)
         expanded = node["expanded"]
         cache = "+"

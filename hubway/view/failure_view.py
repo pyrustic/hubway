@@ -1,9 +1,8 @@
 import tkinter as tk
-from pyrustic.view import View
-from pyrustic import tkmisc
+from viewable import Viewable
 
 
-class FailureView(View):
+class FailureView(Viewable):
     def __init__(self, master, main_view, main_host, data):
         super().__init__()
         self._master = master
@@ -24,13 +23,3 @@ class FailureView(View):
         # button quit
         button = tk.Button(self._body, text="Close", command=self.destroy)
         button.pack(anchor="e", padx=2, pady=2)
-
-    def _on_display(self):
-        pass
-
-    def _on_destroy(self):
-        pass
-
-    def _toplevel_geometry(self):
-        super()._toplevel_geometry()
-        tkmisc.dialog_effect(self._body)
