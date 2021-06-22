@@ -1,0 +1,14 @@
+{
+    "ante_build": [
+        "hubway.hooking.ante_build_hook"
+    ],
+    "ante_release": [
+        "hubway.hooking.ante_release_hook"
+    ],
+    "post_build": [
+        "hubway.hooking.post_build_hook"
+    ],
+    "post_release": [
+        "hubway.hooking.post_release_hook"
+    ]
+}
